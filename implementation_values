@@ -1,0 +1,61 @@
+ 
+CETA: [ 1.45262197e+12  1.33170000e+02  5.82000000e+01 -1.34000000e+00
+   9.05000000e+00  1.51497340e+11  1.42560746e+11  3.62333490e+11
+   3.71165583e+11  2.42947400e+04  4.05300000e+01  9.76000000e+00
+   2.94900000e+01  5.88800000e+01  2.34400000e+01  1.84000000e+01
+   5.81600000e+01  1.87272633e+14  4.34767354e+11 -1.93000000e+00
+   2.52000000e+00  9.80000000e-01  2.28600000e+01  1.21400000e+01
+   1.76500000e+01  1.41700000e+01  4.30100000e+01  6.21100000e+01
+   7.51000000e+00  3.75000000e+00  4.02100000e+01  3.75100000e+01
+   5.91000000e+00  9.50000000e+00  7.55000000e+00  3.08500000e+01
+   4.35400000e+01  2.00800000e+01  2.24000000e+00  3.44300000e+01]
+
+CPTPP: [1.95847469e+12  1.00913213e+02  2.53797492e+01  3.81530739e+00
+   9.30162026e+00  7.90349734e+10  5.65438704e+10  4.61116198e+11
+   3.94726550e+11  1.44776951e+04  4.12331829e+01  1.11479981e+01
+   2.95289547e+01  5.41133390e+01  3.60703501e+01  2.01533862e+01
+   4.37763282e+01 -1.09883346e+14  3.20821883e+11 -4.49864725e+00
+   2.95953471e+00  2.00717014e+00  2.23896664e+00  1.64385227e+01
+   2.69997146e+01  1.03268547e+01  5.99069873e+01  6.14514962e+01
+   4.95621319e+00  5.92574162e+00  5.26825867e+01  4.68011896e+01
+   4.79114273e+00  8.78186723e+00  1.15757999e+01  3.75261941e+01
+   3.34763893e+01  9.06617716e+00  8.47826154e+00  3.88493300e+01]
+
+Corresponds to real values for: ['GDP (constant 2015 US$)', 'Trade (% of GDP)',
+       'Foreign direct investment, net inflows (% of GDP)',
+       'Foreign direct investment, net outflows (% of GDP)',
+       'Tariff rate, applied, simple mean, all products (%)',
+       'Commercial service exports (current US$)',
+       'Commercial service imports (current US$)',
+       'Merchandise exports (current US$)',
+       'Merchandise imports (current US$)',
+       'GDP per capita (constant 2015 US$)', 'Gini index',
+       'Agriculture, forestry, and fishing, value added (% of GDP)',
+       'Industry (including construction), value added (% of GDP)',
+       'Services, value added (% of GDP)',
+       'Employment in agriculture (% of total employment) (modeled ILO estimate)',
+       'Employment in industry (% of total employment) (modeled ILO estimate)',
+       'Employment in services (% of total employment) (modeled ILO estimate)',
+       'Exports of goods and services (constant LCU)',
+       'Imports of goods and services (constant 2015 US$)',
+       'External balance on goods and services (% of GDP)',
+       'Agricultural raw materials exports (% of merchandise exports)',
+       'Agricultural raw materials imports (% of merchandise imports)',
+       'Fuel exports (% of merchandise exports)',
+       'Fuel imports (% of merchandise imports)',
+       'Food exports (% of merchandise exports)',
+       'Food imports (% of merchandise imports)',
+       'Manufactures exports (% of merchandise exports)',
+       'Manufactures imports (% of merchandise imports)',
+       'Ores and metals exports (% of merchandise exports)',
+       'Ores and metals imports (% of merchandise imports)',
+       'Computer, communications and other services (% of commercial service exports)',
+       'Computer, communications and other services (% of commercial service imports)',
+       'Insurance and financial services (% of commercial service exports)',
+       'Insurance and financial services (% of commercial service imports)',
+       'Transport services (% of commercial service exports)',
+       'Transport services (% of commercial service imports)',
+       'Travel services (% of commercial service exports)',
+       'Travel services (% of commercial service imports)',
+       'Unemployment, total (% of total labor force) (national estimate)',
+       'Poverty headcount ratio at national poverty lines (% of population)']

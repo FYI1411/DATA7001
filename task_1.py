@@ -1,59 +1,86 @@
-import numpy as np
 import pandas as pd
-from sklearn.preprocessing import StandardScaler, normalize
+import numpy as np
 import matplotlib.pyplot as plt
+from sklearn.linear_model import LogisticRegression
+from sklearn.neighbors import NearestNeighbors
 from sklearn.cluster import KMeans
+from sklearn.decomposition import PCA
+import statsmodels.api as sm
+from preprocessing_checks import prepare_df
 
-temp_df = pd.read_csv("t1.csv")
-df_imports = temp_df[temp_df['Series Name'] == 'Imports of goods and services (% of GDP)']
-df_exports = temp_df[temp_df['Series Name'] == 'Exports of goods and services (% of GDP)']
-df_trade = temp_df[temp_df['Series Name'] == 'Trade (% of GDP)']
-df_merch = temp_df[temp_df['Series Name'] == 'Merchandise exports (current US$)']
-df_serv = temp_df[temp_df['Series Name'] == 'Commercial service exports (current US$)']
+"""
+two methods clustering, pca_clustering return 4 and 5 clusters to be optimal respectively.
 
-df = pd.DataFrame()
-df.insert(0, "Country Code", temp_df.iloc[:, 0].unique())
-df.insert(1, "Imports (% of GDP)", np.array(df_imports.iloc[:, -1]))
-df.insert(2, "Exports (% of GDP)", np.array(df_exports.iloc[:, -1]))
-df.insert(3, "Trade (% of GDP)", np.array(df_trade.iloc[:, -1]))
-df.insert(4, "Merchandise Exports (current US$)", np.array(df_merch.iloc[:, -1]))
-df.insert(5, "Commercial service exports (current US$)", np.array(df_serv.iloc[:, -1]))
+All we need is compare the clusters returned by both of them and see how they diiffer in terms of all the variables - e.g., 
+does Cluster 1 have a higher average GDP than the other clusters? for every cluster.
 
-# print(df.isnull().sum()) # in this case, we can just drop any nulls 
-df = df.dropna()
-# print(df.info()) # leaves 165 points
+Report the statistically significant ones
 
-""" transform data into preferred format (code, trade balance (% of GDP), trade (% of GDP), 
-    merchandise/commercial service), then scaled """
-df1 = pd.DataFrame()
-# df1.insert(0, "Country Code", df.iloc[:, 0])
-df1.insert(0, "Trade balance (% of GDP)", np.array(df.iloc[:, 1])/np.array(df.iloc[:, 2]))
-df1.insert(1, "Trade (% of GDP)", np.array(df.iloc[:, 3]))
-df1.insert(2, "Merchandise/Commercial Exports", np.array(df.iloc[:, 4])/np.array(df.iloc[:, 5]))
+Download wdi.csv and preprocessing_checks.py, put it in directory
 
-scaler = StandardScaler()
-df1 = pd.DataFrame(scaler.fit_transform(df1)) # scale + normalise
-df1 = pd.DataFrame(normalize(df1))
+"""
 
+def clustering():
+    df = prepare_df("wdi.csv")
+    df = df[df["Year"] == 2015] # isolate to 2015
+    countries = df.loc[:, "Country Name"]
+    # covariates = ['Trade (% of GDP)', 'External balance on goods and services (% of GDP)', 'Foreign direct investment, net inflows (% of GDP)', 'Employment in agriculture (% of total employment) (modeled ILO estimate)', 'Employment in industry (% of total employment) (modeled ILO estimate)','Employment in services (% of total employment) (modeled ILO estimate)']
+    covariates = ['Trade (% of GDP)', 'External balance on goods and services (% of GDP)']
+    
+    df = df.loc[:, covariates]
 
-km = KMeans(n_clusters=3).fit(df1.iloc[:, :2])
-preds = km.predict(df1.iloc[:, :2])
-plt.scatter(df1.iloc[:, 0], df1.iloc[:, 1], c=preds)
-plt.xlabel('Trade balance (% of GDP)')
-plt.ylabel('Trade (% of GDP)')
-# for i, txt in enumerate(np.array(df.iloc[:, 0])):
-#     plt.annotate(txt, (df1.iloc[i, 0], df1.iloc[i, 1]))
+    results = []
+    for n in range(2, 10):
+        km = KMeans(n_clusters=n).fit(df)
+        results.append(km.inertia_)
+    plt.plot(list(range(2, 10)), results)
+    plt.xlabel("n_clusters")
+    plt.ylabel("inertia")
+    plt.title("Elbow-test for n_clusters")
+    plt.show()
 
-plt.show()
+    km = KMeans(n_clusters=4).fit(df)
+    preds = km.predict(df)
+    plt.scatter(df.loc[:, 'Trade (% of GDP)'], df.loc[:, 'External balance on goods and services (% of GDP)'], c=preds)
+    plt.xlabel("Trade (% of GDP)")
+    plt.ylabel('External balance on goods and services (% of GDP)')
+    plt.title("Clustering of countries by Trade (% of GDP) and External balance on goods and services (% of GDP)")
+    # for i, txt in enumerate(countries):
+    #     if txt in ["China", "Brazil", "Spain", "United States", "Australia", "Japan"]:
+    #         plt.annotate(txt, (df.iloc[i, 0], df.iloc[i, 1]))
+    plt.show()
 
-km = KMeans(n_clusters=3).fit(df1.iloc[:, :3])
-preds = km.predict(df1.iloc[:, :3])
-fig = plt.figure()
-ax = fig.add_subplot(projection='3d')
-ax.scatter(df1.iloc[:, 0], df1.iloc[:, 1], df1.iloc[:, 2], c=preds)
-ax.set_xlabel("Trade balance (% of GDP)")
-ax.set_ylabel("Trade (% of GDP)")
-ax.set_zlabel('Merchandise/Commercial Exports')
+# clustering()
 
+def pca_clustering():
+    df = prepare_df("wdi.csv")
+    df = df[df["Year"] == 2015] # isolate to 2015
+    countries = df.loc[:, "Country Name"]
+    covariates = ['Trade (% of GDP)', 'External balance on goods and services (% of GDP)', 'Foreign direct investment, net inflows (% of GDP)', 'Employment in agriculture (% of total employment) (modeled ILO estimate)', 'Employment in industry (% of total employment) (modeled ILO estimate)','Employment in services (% of total employment) (modeled ILO estimate)']
+    # covariates = ['Trade (% of GDP)', 'External balance on goods and services (% of GDP)']
+    
+    df = df.loc[:, covariates]
+    df = pd.DataFrame(PCA(n_components=2).fit_transform(df))
 
-plt.show()
+    # results = []
+    # for n in range(2, 10):
+    #     km = KMeans(n_clusters=n).fit(df)
+    #     results.append(km.inertia_)
+    # plt.plot(list(range(2, 10)), results)
+    # plt.xlabel("n_clusters")
+    # plt.ylabel("inertia")
+    # plt.title("Elbow-test for n_clusters")
+    # plt.show()
+
+    km = KMeans(n_clusters=5).fit(df)
+    preds = km.predict(df)
+    plt.scatter(df.iloc[:, 0], df.iloc[:, 1], c=preds)
+    plt.xlabel("Trade (% of GDP)")
+    plt.ylabel('External balance on goods and services (% of GDP)')
+    plt.title("Clustering of countries by Trade (% of GDP) and External balance on goods and services (% of GDP)")
+    for i, txt in enumerate(countries):
+        if txt in ["China", "Brazil", "Spain", "United States", "Australia", "Japan"]:
+            plt.annotate(txt, (df.iloc[i, 0], df.iloc[i, 1]))
+    plt.show()
+
+# pca_clustering()

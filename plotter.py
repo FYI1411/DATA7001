@@ -27,15 +27,15 @@ series_names = [
  #'Imports of goods and services (constant 2015 US$)'
  #'External balance on goods and services (% of GDP)'
  #'Agricultural raw materials exports (% of merchandise exports)',
- #'Agricultural raw materials imports (% of merchandise imports)',
+ 'Agricultural raw materials imports (% of merchandise imports)',
  #'Fuel exports (% of merchandise exports)',
- #'Fuel imports (% of merchandise imports)',
+ 'Fuel imports (% of merchandise imports)',
  #'Food exports (% of merchandise exports)',
- #'Food imports (% of merchandise imports)',
+ 'Food imports (% of merchandise imports)',
  #'Manufactures exports (% of merchandise exports)',
- #'Manufactures imports (% of merchandise imports)',
+ 'Manufactures imports (% of merchandise imports)',
  #'Ores and metals exports (% of merchandise exports)',
- #'Ores and metals imports (% of merchandise imports)'
+ 'Ores and metals imports (% of merchandise imports)'
  #'Computer, communications and other services (% of commercial service exports)',
  #'Computer, communications and other services (% of commercial service imports)',
  #'Insurance and financial services (% of commercial service exports)',
@@ -47,20 +47,20 @@ series_names = [
  #'Unemployment, total (% of total labor force) (national estimate)'
  #'Poverty headcount ratio at national poverty lines (% of population)'
 ]
-series_names = [
+#series_names = [
 #     'Merchandise exports (current US$)',
 #     'Commercial service exports (current US$)'
-      'Agricultural raw materials exports (% of merchandise exports)',
-      'Fuel exports (% of merchandise exports)',
-      'Food exports (% of merchandise exports)',
-     'Manufactures exports (% of merchandise exports)',
-      'Ores and metals exports (% of merchandise exports)',
+#      'Agricultural raw materials exports (% of merchandise exports)',
+#      'Fuel exports (% of merchandise exports)',
+#      'Food exports (% of merchandise exports)',
+#      'Manufactures exports (% of merchandise exports)',
+#      'Ores and metals exports (% of merchandise exports)',
 #    'Computer, communications and other services (% of commercial service exports)',
 #     'Insurance and financial services (% of commercial service exports)',
 #     'Transport services (% of commercial service exports)',
 #     'Travel services (% of commercial service exports)'
-]
-
+#]
+'''
 plt.style.use('seaborn-v0_8')
 
 # Assuming df is already defined and filtered
@@ -82,34 +82,69 @@ filtered_data = filtered_data.apply(pd.to_numeric, errors='coerce')
 
 #Calculate averages for 2014-2018 and 2019-2023
 averages_df = filtered_data.loc['2013':]
-#values = np.array(averages_df.iloc[:, 0].values) + np.array(averages_df.iloc[:, 1].values)
-# Sum 'Ores and metals exports' + 'Fuel exports'
-averages_df['Ores & Fuel'] = averages_df['Ores and metals exports (% of merchandise exports)'] + averages_df['Fuel exports (% of merchandise exports)']
+'''
+plt.style.use('seaborn-v0_8')
 
-# Sum 'Agricultural raw materials exports' + 'Food exports' + 'Manufactures exports'
-averages_df['Agriculture & Food'] = (averages_df['Agricultural raw materials exports (% of merchandise exports)'] + 
-                                            averages_df['Food exports (% of merchandise exports)'])
+# Filter the DataFrame for Australia
+df = df[df['Country Name'] == 'Australia']
+print("Unique Series Names:", df['Series Name'].unique())
 
-averages_df['Manufactures'] = averages_df['Manufactures exports (% of merchandise exports)']
+# Filter the DataFrame for the specific series names
+filtered_data = df[df['Series Name'].isin(series_names)]
 
-# Drop the original columns, leaving only the summed columns
-averages_df = averages_df[['Ores & Fuel', 'Agriculture & Food', 'Manufactures']]
+# Set 'Series Name' as index and drop unnecessary columns
+filtered_data.set_index('Series Name', inplace=True)
+filtered_data = filtered_data.drop(columns=['Country Name'])
 
-# Define custom order for sorting (if needed)
-#averages_df = averages_df.sort_values(by='2014', axis=1, ascending=False)
-#print(averages_df.head())
-#print(np.array(averages_df.iloc[:, 0].values) + np.array(averages_df.iloc[:, 1].values))
-# Create a clustered bar chart for averages
-ax = averages_df.plot(kind='line', marker='o')
+# Transpose the DataFrame to have years as index
+filtered_data = filtered_data.T
+
+# Convert the filtered data to numeric if necessary
+filtered_data = filtered_data.apply(pd.to_numeric, errors='coerce')
+
+rename_mapping = {
+    'Computer, communications and other services (% of commercial service exports)': 'Computer, communications and other services',
+    'Insurance and financial services (% of commercial service exports)': 'Insurance and financial services',
+    'Transport services (% of commercial service exports)': 'Transport services',
+    'Travel services (% of commercial service exports)': 'Travel services'
+}
+
+rename_mapping = {
+    'Agricultural raw materials imports (% of merchandise imports)': 'Agricultural raw materials imports',
+    'Fuel imports (% of merchandise imports)': 'Fuel imports',
+    'Food imports (% of merchandise imports)': 'Food imports',
+    'Manufactures imports (% of merchandise imports)': 'Manufactures imports',
+    'Ores and metals imports (% of merchandise imports)': 'Ores and metals imports'
+}
+
+# Rename the columns using the mapping
+filtered_data.rename(columns=rename_mapping, inplace=True)
+
+# Select only the years from 2014 onwards
+averages_df = filtered_data.loc['2014':]
+
+# Calculate averages for the periods 2014-2018 and 2019-2023
+averaged_periods = {
+    'Before CPTPP': averages_df.loc['2014':'2018'].mean(),
+    'After CPTPP': averages_df.loc['2019':'2023'].mean()
+}
+
+# Create a DataFrame from the averaged periods
+averaged_df = pd.DataFrame(averaged_periods).T
+
+# Sort the columns by the average value of 2014-2018
+averaged_df = averaged_df.sort_values(by='Before CPTPP', axis=1, ascending=False)
+
+ax = averaged_df.plot(kind='bar')
 
 # Customize the plot
-plt.title('Australian Exports (2014-2023)')
-plt.ylabel('Contribution To Australia Exports (Z-score)')
-plt.xlabel('Year')
+plt.title('Average Australian Merchandise Imports (2014-2018 vs 2019-2023)')
+plt.ylabel('Percentage of merchandise imports (%)')
+#plt.xlabel('Year')
+plt.xticks(rotation=0)
 plt.tight_layout()
-ax.axvline(x=5.5, color='red', linestyle='--', label='CPTPP Signed')  # Adjust x=5 if needed based on your data's structure
-plt.legend(fontsize=9, loc='best')
-'''
+#ax.axvline(x=5.5, color='red', linestyle='--', label='CPTPP Signed')  # Adjust x=5 if needed based on your data's structure
+plt.legend(fontsize=10, loc='best')
 # Add labels to each bar
 for container in ax.containers:
     for bar in container:
@@ -121,7 +156,6 @@ for container in ax.containers:
                 f'{height:.2f}',  # Label format
                 ha='center', va='bottom', fontsize=9, color='black'  # Adjust label appearance
             )
-'''
 plt.show()
 '''
 # Split the list into b_scores and i_scores

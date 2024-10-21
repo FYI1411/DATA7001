@@ -2,8 +2,8 @@ import os
 import subprocess
 
 # Specify the directory containing the PNG files
-input_directory = "old_prepost_plot"
-output_directory = "old_prepost_plot/svg"
+input_directory = "plot/new_plot/"
+output_directory = f"{input_directory}/svg"
 
 # Create output directory if it doesn't exist
 os.makedirs(output_directory, exist_ok=True)
